@@ -154,7 +154,12 @@ static inline bool cobs_encode_stream_single(struct cobs_encode *encode, uint8_t
 		if (encode->u.zeros.next_zero == 0) {
 			uint8_t zero;
 			size_t num_pulled = net_buf_pull_across_fragments(&encode->buf, &zero, 1);
+#ifdef CONFIG_ASSERT
 			__ASSERT_NO_MSG(num_pulled == 1);
+#else
+			LOG_ERR("No zero found in netbuf");
+			(void)num_pulled;
+#endif
 			__ASSERT_NO_MSG(zero == 0);
 
 			size_t num_processed;
@@ -230,7 +235,12 @@ static inline bool cobs_encode_stream_single(struct cobs_encode *encode, uint8_t
 
 	case COBS_ENCODE_STATE_ZEROS_DATA: {
 		size_t num_pulled = net_buf_pull_across_fragments(&encode->buf, output, 1);
+#ifdef CONFIG_ASSERT
 		__ASSERT_NO_MSG(num_pulled == 1);
+#else
+		LOG_ERR("No zero found in netbuf");
+		(void)num_pulled;
+#endif
 
 		encode->u.zeros.data_left -= 1;
 		encode->u.zeros.next_zero -= 1;
@@ -262,7 +272,12 @@ static inline bool cobs_encode_stream_single(struct cobs_encode *encode, uint8_t
 
 	case COBS_ENCODE_STATE_NOZEROS_DATA: {
 		size_t num_pulled = net_buf_pull_across_fragments(&encode->buf, output, 1);
+#ifdef CONFIG_ASSERT
 		__ASSERT_NO_MSG(num_pulled == 1);
+#else
+		LOG_ERR("No zero found in netbuf");
+		(void)num_pulled;
+#endif
 
 		encode->u.nozeros.data_left -= 1;
 		encode->u.nozeros.total_length -= 1;
